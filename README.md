@@ -30,7 +30,7 @@ This Python script can import data from a CSV file into either a MySQL or SQLite
 Modify the following variables in the script to match your database configuration:
 
 ´´´python
-# For MySQL
+#### For MySQL
 user_name = "root"
 password = ""
 host = "localhost"
@@ -38,5 +38,5 @@ port = "3306"
 target_database = 'taba_database'
 table_name_mysql = "lacity"
 
-# For SQLite
+#### For SQLite
 table_name_sqlite = "lacity"
