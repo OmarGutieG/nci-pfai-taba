@@ -13,19 +13,19 @@ This Python program allows you to download a CSV file from a URL and save it to 
 
 ### Usage
 1. Clone the repository to your local machine:
-    bash
-    git clone https://github.com/OmarGutieG/nci-pfai-taba.git
+  - `bash`
+  - `git clone https://github.com/OmarGutieG/nci-pfai-taba.git`
 2. Navigate to the project directory
-    cd csv-to-sql-converter
+  - `cd csv-to-sql-converter`
 3. Create a virtual environment (optional but recommended):
-    python3 -m venv venv
+  - `python3 -m venv venv`
 4. Activate the virtual environment:
-    • On Windows: venv\Scripts\activate
-    • On macOS/Linux:
+  - On Windows: `venv\Scripts\activate`
+  - On macOS/Linux: `source venv/bin/activate`
 5. Install the required dependencies:
-    pip install -r requirements.txt
+  - `pip install -r requirements.txt`
 6. Run the main program
-    python main.py
+  - `python main.py`
 7. Follow the on-screen instructions to choose the database type (MySQL or SQLite), enter connection details, and perform operations.
 8. The program will prompt you to get and print data from the database or exit after saving data.
 
