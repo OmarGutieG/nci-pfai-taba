@@ -16,7 +16,7 @@ This Python program allows you to download a CSV file from a URL and save it to 
   - `bash`
   - `git clone https://github.com/OmarGutieG/nci-pfai-taba.git`
 2. Navigate to the project directory
-  - `cd csv-to-sql-converter`
+  - `cd nci-pfai-taba`
 3. Create a virtual environment (optional but recommended):
   - `python3 -m venv venv`
 4. Activate the virtual environment:
@@ -31,6 +31,6 @@ This Python program allows you to download a CSV file from a URL and save it to 
 
 ### Additional Information
 - The script uses SQLAlchemy to handle database connections.
-- CSV data is downloaded from the following URL: "https://data.snb.ch/api/cube/devkua/data/csv/en"
+- CSV data is downloaded from the following URL: https://data.snb.ch/api/cube/devkua/data/csv/en
 - Ensure that you have a MySQL server running if you choose the MySQL option.
 - The program will create a SQLite database file in the same directory if you choose the SQLite option.
