@@ -7,11 +7,13 @@ from sqlalchemy.exc import ProgrammingError, SQLAlchemyError
 # Step 1: Connect to the MySQL database using SQLAlchemy
 print("Connecting to MySQL...")
 # Configure the connection parameters as needed
-user_name = "root"
-password = ""
-host = "localhost"
-port = "3306"
-sql_url = f"mysql+mysqlconnector://{user_name}:{password}@{host}:{port}"
+user_name       = "root"
+password        = ""
+host            = "localhost"
+port            = "3306"
+sql_url         = f"mysql+mysqlconnector://{user_name}:{password}@{host}:{port}"
+target_database = 'swiss_banking'
+table_name      = "currency_exchange_rates"
 
 # Check if there is a connection to the MySQL server
 try:
@@ -27,7 +29,6 @@ print("Connection to MySQL server was successful.")
 
 # Step 2: Check for the existence of the database and the table
 print("Checking for the existence of the database and the table...")
-target_database = 'taba_database'
 database_url = f"{sql_url}/{target_database}"
 engine = create_engine(database_url)
 # Check if the target database exists and create it if it doesn't
@@ -40,7 +41,6 @@ except ProgrammingError:
     with sql_engine.connect() as connection:
         connection.execute(create_database_query)
 
-table_name = "lacity"
 # Check if the table exists and drop it if it does
 inspector = inspect(engine)
 if inspector.has_table(table_name):
@@ -52,26 +52,21 @@ print("Database and table are ready to be used.")
 
 # Step 3: Download CSV data
 print("Downloading CSV data...")
-csv_url = "https://data.cityofchicago.org/api/views/2tsv-5s43/rows.csv?accessType=DOWNLOAD"
+csv_url = "https://data.snb.ch/api/cube/devkua/data/csv/en"
+
 response = requests.get(csv_url)
 data = response.text
-
 print("CSV data has been downloaded succesfully.")
 
 # Step 4: Parse CSV data using pandas
 print("Parsing CSV data...")
 column_data_types = {
-    'Reporting Year': 'Int64',
-    'Bank': 'object',
-    'RFP Source': 'object',
-    'Data Description': 'object',
-    'ZIP Code': 'object',
-    'Census Tract': 'Float64',
-    'Number of Accounts': 'Int64',
-    'Total Combined Balance': 'Float64',
-     #'date_column': 'datetime64',  # Assuming it's a Pandas datetime64 column
+    'Date' : 'Int64',
+    'D1'   : 'object',
+    'Value': 'Float64',
 }
-df = pd.read_csv(StringIO(data), dtype=column_data_types, na_values=['NA']) # , parse_dates=['date_column']
+df = pd.read_csv(StringIO(data), na_values=['NA'], sep=';',  skiprows=3, dtype=column_data_types)
+df = df.dropna()
 
 print("CSV data has been parsed succesfully.")
 
@@ -103,7 +98,7 @@ for column in columns:
 
 # Connect to the SQLite database using SQLAlchemy
 # Query the data from the SQLite database
-query = "SELECT * FROM lacity"
+query = f"SELECT * FROM {table_name}"
 df_from_db = pd.read_sql_query(query, engine)
 
 # Display the retrieved data
