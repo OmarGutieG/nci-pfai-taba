@@ -1,8 +1,6 @@
 # Data Importer
 
-This Python script can import data from a CSV file into either a MySQL or SQLite database. It connects to the specified database, downloads CSV data from a given URL, parses it using pandas, and stores the data in the selected database. The script can work with both MySQL and SQLite databases.
-
-## Setup
+This Python program allows you to download a CSV file from a URL and save it to a SQL database. You can choose between using MySQL or SQLite databases.
 
 ### Prerequisites
 
@@ -14,28 +12,25 @@ This Python script can import data from a CSV file into either a MySQL or SQLite
   - `mysql-connector-python`
 
 ### Usage
-1. Run the script in a Python environment.
-2. The script will download CSV data from the specified URL, parse it, and store it in either the MySQL or SQLite database.
-3. The retrieved data will be displayed.
+1. Clone the repository to your local machine:
+    bash
+    git clone https://github.com/OmarGutieG/nci-pfai-taba.git
+2. Navigate to the project directory
+    cd csv-to-sql-converter
+3. Create a virtual environment (optional but recommended):
+    python3 -m venv venv
+4. Activate the virtual environment:
+    • On Windows: venv\Scripts\activate
+    • On macOS/Linux:
+5. Install the required dependencies:
+    pip install -r requirements.txt
+6. Run the main program
+    python main.py
+7. Follow the on-screen instructions to choose the database type (MySQL or SQLite), enter connection details, and perform operations.
+8. The program will prompt you to get and print data from the database or exit after saving data.
 
 ### Additional Information
 - The script uses SQLAlchemy to handle database connections.
-- CSV data is downloaded from the following URL: CSV Data.
-- For MySQL, a database named taba_database will be used, and the table will be named lacity.
-- For SQLite, a file named taba_database.db will be created in the script's directory, and the table will be named lacity.
-
-
-### Configuration
-
-Modify the following variables in the script to match your database configuration:
-
-#### For MySQL
-- user_name = "root"
-- password = ""
-- host = "localhost"
-- port = "3306"
-- target_database = 'taba_database'
-- table_name = "lacity"
-
-#### For SQLite
-- table_name = "lacity"
+- CSV data is downloaded from the following URL: "https://data.snb.ch/api/cube/devkua/data/csv/en"
+- Ensure that you have a MySQL server running if you choose the MySQL option.
+- The program will create a SQLite database file in the same directory if you choose the SQLite option.
