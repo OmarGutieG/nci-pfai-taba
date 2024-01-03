@@ -19,10 +19,11 @@ def after_data_save(database_url):
     print("Now that data is saved what do you want to do?")
     print("     1. Get and print data from the database")
     print("     2. Exit program")
+    print("     3. Process data and print")
 
-    operation_choice = input("Enter your choice (1 or 2): ")
+    operation_choice = input("Enter your choice (1, 2 or 3): ")
 
-    while operation_choice not in ('1', '2'):
+    while operation_choice not in ('1', '2', '3'):
         print("Invalid choice. Please enter 1 or 2.")
         operation_choice = input("Enter your choice (1 or 2): ")
 
@@ -31,6 +32,8 @@ def after_data_save(database_url):
     elif operation_choice == '2':
         print("Exiting program...")
         sys.exit()
+    elif operation_choice == '3':
+        process_data(database_url)
 
 def main():
     print("Welcome to the CSV to SQL converter.")

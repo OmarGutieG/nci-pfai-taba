@@ -88,3 +88,92 @@ def get_data_from_sql(database_url):
     # Display the retrieved data
     print("Data retrieved from the SQLite database:")
     print(df_from_db)
+
+def process_data(database_url):
+    # Query the data from the SQLite database
+    query = f"SELECT * FROM {table_name}"
+    engine = create_engine(database_url)
+    df_from_db = pd.read_sql_query(query, engine)
+
+    # Display the retrieved data
+    print("Data retrieved from the SQLite database:")
+    print(df_from_db)
+    df = df_from_db.rename(columns={'D0': 'Type', 'D1': 'Country or zone', 'D2': 'Value type', 'Value': 'Value'})
+    type_dict = {
+        'E': 'Import',
+        'A': 'Export',
+        'H': 'Trade surplus/deficit'
+    }
+    df['Type'] = df['Type'].map(type_dict)
+    country_dict = {
+        'EUROPE_T': 'Europe total',
+        'EU_T': 'European union total',
+        'EUROZONE_T': 'Euroarea total',
+        'DE': 'Germany',
+        'IT': 'Italy',
+        'FR': 'France',
+        'AT': 'Austria',
+        'ES': 'Spain',
+        'NL': 'Netherlands',
+        'BE': 'Belgium',
+        'IE': 'Ireland',
+        'PL': 'Poland',
+        'SE': 'Sweden',
+        'CZ': 'Czech Republic',
+        'GB': 'United Kingdom',
+        'RU': 'Russia',
+        'ASIA_T': 'Asia total',
+        'ME_T': 'Middle East total',
+        'AE': 'United Arab Emirates',
+        'SAU': 'Saudi Arabia',
+        'CN': 'China',
+        'HK': 'Hong Kong',
+        'JP': 'Japan',
+        'SG': 'Singapore',
+        'IN': 'India',
+        'KR': 'South Korea',
+        'TUR': 'Turkey',
+        'NAM_T': 'North America total',
+        'US': 'United States',
+        'CA': 'Canada',
+        'SAM_T': 'South America total',
+        'BR': 'Brazil',
+        'MX': 'Mexico',
+        'AFRICA_T': 'Africa total',
+        'ZA': 'South Africa',
+        'EG': 'Egypt',
+        'OCEANIA_T': 'Oceania total',
+        'AU': 'Australia'
+    }
+    df['Country or zone'] = df['Country or zone'].map(country_dict)
+    #Filter to only include value type WMF
+    df = df[df['Value type'] == 'WMF']
+    """
+    value_type_dict = {
+        'WMF': 'Value in CHF million',
+        #'VVP': 'Change in %',
+    }
+    df['Value type'] = df['Value type'].map(value_type_dict)
+    """
+    # Remove Value type column
+    df = df.drop(columns=['Value type'])
+
+    # Separate date into year and month (1997-1 -> 1997, 1)
+    df['Year'] = df['Date'].str.split('-').str[0]
+    df = df.drop(columns=['Date'])
+    # Place Year column at the beginning of the dataframe and leave all the others the same
+    cols = df.columns.tolist()
+    cols = cols[-1:] + cols[:-1]
+    df = df[cols]
+    # Remove all rows with year minor than 2004
+    df = df[df['Year'] >= '2004']
+    # Sum by year, type and country
+    df = df.groupby(['Year', 'Type', 'Country or zone']).sum()
+
+    # Display the retrieved data
+    print("Processed data:")
+    print(df)
+
+
+
+    
