@@ -54,9 +54,9 @@ def main():
             sql_url, database_url = get_mysql_connection_details()
 
             # Test MySQL connection
-            if prepare_my_sql(sql_url, database_url):
+            if prepare_my_sql(sql_url, database_url, table_name):
                 data = extract_csv_data()
-                load_data_to_sql(data, database_url)
+                load_data_to_sql(data, database_url, table_name)
                 print("CSV file saved to MySQL database.\n")
                 after_data_save(database_url)
                 break
@@ -67,7 +67,7 @@ def main():
                     print("Switching to SQLite.")
                     data = extract_csv_data()
                     database_url = sqlite_database_url
-                    load_data_to_sql(data, database_url)
+                    load_data_to_sql(data, database_url, table_name)
                     print("CSV file saved to SQLite database.\n")
                     after_data_save(database_url)
                     break
@@ -75,7 +75,7 @@ def main():
         # SQLite
         data = extract_csv_data()
         database_url = sqlite_database_url
-        load_data_to_sql(data, database_url)
+        load_data_to_sql(data, database_url, table_name)
 
         print("CSV file saved to SQLite database.\n")
         after_data_save(database_url)

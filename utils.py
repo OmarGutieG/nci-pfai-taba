@@ -5,7 +5,7 @@ from io import StringIO
 from sqlalchemy.exc import ProgrammingError, SQLAlchemyError
 from constants import *
 
-def prepare_my_sql(sql_url, database_url):
+def prepare_my_sql(sql_url, database_url, table_name):
     try:
         sql_engine = create_engine(sql_url)
         sql_engine.connect()
@@ -35,6 +35,11 @@ def prepare_my_sql(sql_url, database_url):
     inspector = inspect(engine)
     if inspector.has_table(table_name):
         drop_table_query = text(f"DROP TABLE {table_name}")
+        with engine.connect() as connection:
+            connection.execute(drop_table_query)
+    
+    if inspector.has_table(table_name_processed):
+        drop_table_query = text(f"DROP TABLE {table_name_processed}")
         with engine.connect() as connection:
             connection.execute(drop_table_query)
 
@@ -69,7 +74,7 @@ def extract_csv_data():
     df = df.dropna()
     return df
 
-def load_data_to_sql(df, database_url):
+def load_data_to_sql(df, database_url, table_name):
     # Batching and Inserting into MySQL database
     chunk_size = 1000
     engine = create_engine(database_url)
@@ -151,7 +156,7 @@ def process_data(database_url):
     """
     value_type_dict = {
         'WMF': 'Value in CHF million',
-        #'VVP': 'Change in %',
+        'VVP': 'Change in %',
     }
     df['Value type'] = df['Value type'].map(value_type_dict)
     """
@@ -167,8 +172,10 @@ def process_data(database_url):
     df = df[cols]
     # Remove all rows with year minor than 2004
     df = df[df['Year'] >= '2004']
-    # Sum by year, type and country
-    df = df.groupby(['Year', 'Type', 'Country or zone']).sum()
+    # Sum by year, type and country (only summing the values)
+    df = df.groupby(['Year', 'Type', 'Country or zone'])['Value'].sum().reset_index()
+    # Load processed data to SQL in a new table called processed_data
+    load_data_to_sql(df, database_url, table_name_processed)
 
     # Display the retrieved data
     print("Processed data:")
