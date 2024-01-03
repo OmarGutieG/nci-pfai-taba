@@ -5,7 +5,7 @@ from io import StringIO
 from sqlalchemy.exc import ProgrammingError, SQLAlchemyError
 from constants import *
 
-def prepare_my_sql(sql_url, database_url, table_name):
+def prepare_my_sql(sql_url, database_url):
     try:
         sql_engine = create_engine(sql_url)
         sql_engine.connect()
@@ -31,15 +31,25 @@ def prepare_my_sql(sql_url, database_url, table_name):
         with sql_engine.connect() as connection:
             connection.execute(create_database_query)
 
-    # Check if the table exists and drop it if it does
+    # Check if the tables exists and drop it if it does
     inspector = inspect(engine)
-    if inspector.has_table(table_name):
-        drop_table_query = text(f"DROP TABLE {table_name}")
+    if inspector.has_table(table_name_er):
+        drop_table_query = text(f"DROP TABLE {table_name_er}")
         with engine.connect() as connection:
             connection.execute(drop_table_query)
     
-    if inspector.has_table(table_name_processed):
-        drop_table_query = text(f"DROP TABLE {table_name_processed}")
+    if inspector.has_table(table_name_ft):
+        drop_table_query = text(f"DROP TABLE {table_name_ft}")
+        with engine.connect() as connection:
+            connection.execute(drop_table_query)
+    
+    if inspector.has_table(table_name_er_processed):
+        drop_table_query = text(f"DROP TABLE {table_name_er_processed}")
+        with engine.connect() as connection:
+            connection.execute(drop_table_query)
+    
+    if inspector.has_table(table_name_ft_processed):
+        drop_table_query = text(f"DROP TABLE {table_name_ft_processed}")
         with engine.connect() as connection:
             connection.execute(drop_table_query)
 
@@ -50,29 +60,29 @@ def extract_csv_data():
     """Download CSV data from a URL and return it as a string."""
     print("Downloading CSV data...")
 
-    response = requests.get(csv_url)
-    data = response.text
+    response_er = requests.get(csv_url_er)
+    response_ft = requests.get(csv_url_ft)
+    data_er = response_er.text
+    data_ft = response_ft.text
     print("CSV data has been downloaded succesfully.")
 
     # Step 4: Parse CSV data using pandas
     print("Parsing CSV data...")
-    """
-    column_data_types = {
+    er_data_types = {
         'Date' : 'Int64',
         'D1'   : 'object',
         'Value': 'Float64',
     }
-    """
-    column_data_types = {
+    ft_data_types = {
         'Date' : 'object',
         'D0'   : 'object',
         'D1'   : 'object',
         'D2'   : 'object',
         'Value': 'Float64',
     }
-    df = pd.read_csv(StringIO(data), na_values=['NA'], sep=';',  skiprows=3, dtype=column_data_types)
-    df = df.dropna()
-    return df
+    df_er = pd.read_csv(StringIO(data_er), na_values=['NA'], sep=';',  skiprows=3, dtype=er_data_types)
+    df_ft = pd.read_csv(StringIO(data_ft), na_values=['NA'], sep=';',  skiprows=3, dtype=ft_data_types)
+    return df_er, df_ft
 
 def load_data_to_sql(df, database_url, table_name):
     # Batching and Inserting into MySQL database
@@ -86,17 +96,22 @@ def load_data_to_sql(df, database_url, table_name):
 
 def get_data_from_sql(database_url):
     # Query the data from the SQLite database
-    query = f"SELECT * FROM {table_name}"
     engine = create_engine(database_url)
-    df_from_db = pd.read_sql_query(query, engine)
+    query = f"SELECT * FROM {table_name_er}"
+    df_from_db_er = pd.read_sql_query(query, engine)
+    query = f"SELECT * FROM {table_name_ft}"
+    df_from_db_ft = pd.read_sql_query(query, engine)
 
     # Display the retrieved data
-    print("Data retrieved from the SQLite database:")
-    print(df_from_db)
+    print("Exchange rates data retrieved from the SQL database:")
+    print(df_from_db_er)
+
+    print("Foreign trade data retrieved from the SQL database:")
+    print(df_from_db_ft)
 
 def process_data(database_url):
     # Query the data from the SQLite database
-    query = f"SELECT * FROM {table_name}"
+    query = f"SELECT * FROM {table_name_ft}"
     engine = create_engine(database_url)
     df_from_db = pd.read_sql_query(query, engine)
 
@@ -175,7 +190,7 @@ def process_data(database_url):
     # Sum by year, type and country (only summing the values)
     df = df.groupby(['Year', 'Type', 'Country or zone'])['Value'].sum().reset_index()
     # Load processed data to SQL in a new table called processed_data
-    load_data_to_sql(df, database_url, table_name_processed)
+    load_data_to_sql(df, database_url, table_name_ft_processed)
 
     # Display the retrieved data
     print("Processed data:")

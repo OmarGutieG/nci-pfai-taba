@@ -54,9 +54,10 @@ def main():
             sql_url, database_url = get_mysql_connection_details()
 
             # Test MySQL connection
-            if prepare_my_sql(sql_url, database_url, table_name):
-                data = extract_csv_data()
-                load_data_to_sql(data, database_url, table_name)
+            if prepare_my_sql(sql_url, database_url):
+                data_er, data_ft = extract_csv_data()
+                load_data_to_sql(data_er, database_url, table_name_er)
+                load_data_to_sql(data_ft, database_url, table_name_ft)
                 print("CSV file saved to MySQL database.\n")
                 after_data_save(database_url)
                 break
@@ -65,17 +66,19 @@ def main():
                 retry = input("Do you want to retry with different MySQL connection details? (yes/no): ").lower()
                 if retry != 'yes':
                     print("Switching to SQLite.")
-                    data = extract_csv_data()
                     database_url = sqlite_database_url
-                    load_data_to_sql(data, database_url, table_name)
+                    data_er, data_ft = extract_csv_data()
+                    load_data_to_sql(data_er, database_url, table_name_er)
+                    load_data_to_sql(data_ft, database_url, table_name_ft)
                     print("CSV file saved to SQLite database.\n")
                     after_data_save(database_url)
                     break
     elif choice == '2':
         # SQLite
-        data = extract_csv_data()
         database_url = sqlite_database_url
-        load_data_to_sql(data, database_url, table_name)
+        data_er, data_ft = extract_csv_data()
+        load_data_to_sql(data_er, database_url, table_name_er)
+        load_data_to_sql(data_ft, database_url, table_name_ft)
 
         print("CSV file saved to SQLite database.\n")
         after_data_save(database_url)
