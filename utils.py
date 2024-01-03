@@ -51,9 +51,18 @@ def extract_csv_data():
 
     # Step 4: Parse CSV data using pandas
     print("Parsing CSV data...")
+    """
     column_data_types = {
         'Date' : 'Int64',
         'D1'   : 'object',
+        'Value': 'Float64',
+    }
+    """
+    column_data_types = {
+        'Date' : 'object',
+        'D0'   : 'object',
+        'D1'   : 'object',
+        'D2'   : 'object',
         'Value': 'Float64',
     }
     df = pd.read_csv(StringIO(data), na_values=['NA'], sep=';',  skiprows=3, dtype=column_data_types)
@@ -69,8 +78,6 @@ def load_data_to_sql(df, database_url):
     for i in range(0, len(df), chunk_size):
         df_chunk = df.iloc[i:i+chunk_size]
         df_chunk.to_sql(table_name, con=engine, if_exists='append', index=False)
-
-    print("Data has been successfully imported into the MySQL database.")
 
 def get_data_from_sql(database_url):
     # Query the data from the SQLite database
