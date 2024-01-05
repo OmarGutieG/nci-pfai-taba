@@ -110,13 +110,13 @@ def get_data_from_sql(database_url):
     print(df_from_db_ft)
 
 def process_data(database_url):
-    # Query the data from the SQLite database
+    # Query the data from the database
     query = f"SELECT * FROM {table_name_ft}"
     engine = create_engine(database_url)
     df_from_db = pd.read_sql_query(query, engine)
 
     # Display the retrieved data
-    print("Data retrieved from the SQLite database:")
+    print("Foreign trade data retrieved from database:")
     print(df_from_db)
     df = df_from_db.rename(columns={'D0': 'Type', 'D1': 'Country or zone', 'D2': 'Value type', 'Value': 'Value'})
     type_dict = {
@@ -193,9 +193,52 @@ def process_data(database_url):
     load_data_to_sql(df, database_url, table_name_ft_processed)
 
     # Display the retrieved data
-    print("Processed data:")
+    print("Foreign trade processed data:")
     print(df)
 
+    # Query the data from the database
+    query = f"SELECT * FROM {table_name_er}"
+    df_from_db = pd.read_sql_query(query, engine)
 
+    # Display the retrieved data
+    print("Exchange rate data retrieved from database:")
+    print(df_from_db)
+    df = df_from_db.rename(columns={'Date': 'Year', 'D1': 'Currency', 'Value': 'Value'})
+    # Remove all rows with year minor than 2004
+    df = df[df['Year'] >= 2004]
+    # Update currency names
+    currency_dict = {
+        'EUR1': 'Euro',
+        'GBP1': 'Pound Sterling',
+        'DKK100': 'Danish Krone',
+        'NOK100': 'Norwegian Krone',
+        'CZK100': 'Czech Koruna',
+        'HUF100': 'Hungarian Forint',
+        'PLN100': 'Polish Zloty',
+        'RUB1': 'Russian Ruble',
+        'SEK100': 'Swedish Krona',
+        'TRY100': 'Turkish Lira',
+        'USD1': 'US Dollar',
+        'CAD1': 'Canadian Dollar',
+        'ARS1': 'Argentine Peso',
+        'BRL100': 'Brazilian Real',
+        'MXN100': 'Mexican Peso',
+        'ZAR1': 'South African Rand',
+        'JPY100': 'Japanese Yen',
+        'AUD1': 'Australian Dollar',
+        'CNY100': 'Chinese Yuan',
+        'HKD100': 'Hong Kong Dollar',
+        'KRW100': 'South Korean Won',
+        'MYR100': 'Malaysian Ringgit',
+        'NZD1': 'New Zealand Dollar',
+        'SGD1': 'Singapore Dollar',
+        'THB100': 'Thai Baht',
+        'XDR1': 'Special Drawing Rights',
+    }
+    df['Currency'] = df['Currency'].map(currency_dict)
+    # Load processed data to SQL in a new table called processed_data
+    load_data_to_sql(df, database_url, table_name_er_processed)
 
-    
+    # Display the retrieved data
+    print("Exchange rates processed data:")
+    print(df)   
